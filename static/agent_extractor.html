@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Agent Extractor — Compare LLM & Local Extraction</title>
+  <style>
+    body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 0; background: #f8f9fa; }
+    .container {
+      position: absolute;
+      left: 0; top: 0;
+      width: 100vw;
+      min-width: 0;
+      max-width: 100vw;
+      margin: 0;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    h2 { font-size: 1.3em; margin-bottom: 8px; color: #2c3e50; }
+    .row { margin-bottom: 18px; }
+    textarea { width: 100%; min-height: 120px; padding: 10px; border-radius: 4px; border: 1px solid #ced4da; font-size: 1em; }
+    select, input[type="text"] { padding: 8px; border-radius: 4px; border: 1px solid #ced4da; font-size: 1em; }
+    button { padding: 10px 20px; background: #007bff; color: #fff; border: none; border-radius: 4px; cursor: pointer; margin-right: 10px; }
+    button:hover { background: #0056b3; }
+    .results {
+      display: flex;
+      gap: 2%;
+      margin-top: 24px;
+      flex-wrap: nowrap;
+      width: 100%;
+      min-width: 0;
+    }
+    .result-box {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      border: 1px solid #e9ecef;
+      padding: 16px;
+      min-height: 180px;
+      width: 49%;
+      max-width: 49%;
+      min-width: 0;
+      overflow-y: auto;
+      max-height: 60vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .result-box h3 { margin-top: 0; font-size: 1em; color: #007bff; }
+    .chat-markdown { font-size: 1.05em; line-height: 1.7; color: #222; word-break: break-word; }
+    .chat-markdown h1, .chat-markdown h2, .chat-markdown h3 { color: #007bff; margin-top: 1em; }
+    .chat-markdown ul, .chat-markdown ol { margin-left: 1.5em; }
+    .chat-markdown blockquote { border-left: 4px solid #007bff; background: #f4f8ff; margin: 1em 0; padding: 0.5em 1em; color: #555; }
+    .chat-markdown code, .chat-markdown pre { font-family: 'Fira Mono', 'Consolas', 'Menlo', monospace; font-size: 0.98em; background: #f8f9fa; border-radius: 4px; }
+    .chat-markdown pre { padding: 12px; overflow-x: auto; margin: 1em 0; }
+    .chat-markdown table { border-collapse: collapse; width: 100%; margin: 1em 0; }
+    .chat-markdown th, .chat-markdown td { border: 1px solid #e9ecef; padding: 8px; }
+    .chat-markdown th { background: #f4f8ff; }
+    .chat-markdown img { max-width: 100%; border-radius: 4px; }
+    .chat-markdown a { color: #007bff; text-decoration: underline; }
+    @media (max-width: 900px) {
+      .container { padding: 8px; }
+      .results { flex-direction: column; gap: 16px; }
+      .result-box { max-width: 100%; width: 100%; min-width: 0; }
+    }
+    .agent-chat-row {
+      display: flex; align-items: flex-start; margin-bottom: 18px;
+    }
+    .agent-avatar {
+      width: 38px; height: 38px; border-radius: 50%; background: #007bff; color: #fff;
+      display: flex; align-items: center; justify-content: center; font-size: 1.5em; margin-right: 14px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .agent-bubble {
+      background: #fff; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      border: 1px solid #e9ecef; padding: 18px; min-width: 0; max-width: 900px; width: 100%;
+    }
+    .agent-bubble .chat-markdown { margin: 0; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Agent Extractor — Compare LLM & Local Extraction</h2>
+    <div class="row">
+      <label for="codeInput"><b>Paste COBOL or other program code:</b></label>
+      <textarea id="codeInput" placeholder="Paste your COBOL or other code here..."></textarea>
+    </div>
+    <div class="row">
+      <label for="langSelect">Language:</label>
+      <select id="langSelect">
+        <option value="COBOL">COBOL</option>
+        <option value="Python">Python</option>
+        <option value="Java">Java</option>
+        <option value="Other">Other</option>
+      </select>
+      <button id="btnExtractAgent">Extract via Agent (LLM)</button>
+      <button id="btnExtractLocal">Extract via Local Parser</button>
+    </div>
+    <div class="results">
+      <div class="result-box" style="max-width: 900px; width: 100%;">
+        <h3>Agent (LLM) Extraction</h3>
+        <div class="agent-chat-row">
+          <div class="agent-avatar" title="Agent">🤖</div>
+          <div class="agent-bubble">
+            <div id="agentResult" class="chat-markdown" style="min-height:180px; width:100%;"></div>
+          </div>
+        </div>
+      </div>
+      <div class="result-box" style="max-width: 900px; width: 100%;">
+        <h3>Local Extraction</h3>
+        <pre id="localResult">No results yet.</pre>
+      </div>
+    </div>
+  </div>
+  <!-- Render Markdown using marked.js and highlight.js for code blocks -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/highlight.min.js"></script>
+  <script>
+    async function fetchJson(method, url, body) {
+      let opts = { method };
+      if (body) {
+        opts.body = JSON.stringify(body);
+        opts.headers = { 'Content-Type': 'application/json' };
+      }
+      const resp = await fetch(url, opts);
+      // Try to parse JSON, else return error
+      let result;
+      try {
+        result = await resp.json();
+      } catch (e) {
+        result = { error: 'Invalid response from server', status: resp.status };
+      }
+      // If status is not 200, include status and error
+      if (!resp.ok) {
+        result.error = result.error || `HTTP ${resp.status} ${resp.statusText}`;
+      }
+      return result;
+    }
+    document.getElementById('btnExtractAgent').onclick = async function() {
+      // Fallback: extract using regex from a raw string pattern like: parts { text: "...." } role: "model"
+      function extractAllTextsFromRawString(raw) {
+        if (!raw || typeof raw !== "string") return "";
+        // Find all text: "..." inside parts { ... }
+        const matches = [];
+        const regex = /parts\s*\{[^}]*?text\s*:\s*"([^"\\]*(?:\\.[^"\\]*)*)"[^}]*?\}/gs;
+        let m;
+        while ((m = regex.exec(raw)) !== null) {
+          matches.push(m[1].replace(/\\"/g, '"').replace(/\\n/g, "\n").replace(/\\t/g, "\t"));
+        }
+        return matches.join("\n\n");
+      }
+      const code = document.getElementById('codeInput').value;
+      const language = document.getElementById('langSelect').value;
+      const agentResultDiv = document.getElementById('agentResult');
+      agentResultDiv.innerHTML = '<em>Extracting...</em>';
+      const result = await fetchJson('POST', '/agent-extract', { code, language });
+      // Robustly extract 'text' from requirements, handling both {parts: [{text: ...}]} and {text: ...} structures
+      let text = '';
+      if (Array.isArray(result.requirements) && result.requirements.length > 0) {
+        const req = result.requirements[0];
+        // If response shape is { parts: [{ text: ... }] }, concatenate all parts' text
+        if (req && Array.isArray(req.parts) && req.parts.length > 0) {
+          text = req.parts.map(p => typeof p.text === 'string' ? p.text : '').join('\n');
+        }
+        // If response shape is { text: ... }, use text
+        else if (req && typeof req.text === 'string') {
+          text = req.text;
+        }
+      } else if (typeof result.requirements === 'object' && result.requirements !== null) {
+        // If requirements is an object with parts array, concatenate all parts' text
+        if (Array.isArray(result.requirements.parts) && result.requirements.parts.length > 0) {
+          text = result.requirements.parts.map(p => typeof p.text === 'string' ? p.text : '').join('\n');
+        }
+        // If requirements is an object with text field
+        else if (typeof result.requirements.text === 'string') {
+          text = result.requirements.text;
+        }
+      } else if (typeof result.requirements === 'string') {
+        text = result.requirements;
+        // Fallback: try to extract from raw string if it looks like 'parts { text: ... }'
+        if (text.includes('parts') && text.includes('text:')) {
+          const extracted = extractAllTextsFromRawString(text);
+          if (extracted) text = extracted;
+        }
+      }
+      // Remove 'markdown\n' prefix if present
+      if (typeof text === 'string' && text.startsWith('markdown\n')) {
+        text = text.replace(/^markdown\n/, '');
+      }
+      // Render as markdown if it looks like markdown, else as plain text
+      if (text && (text.includes('#') || text.includes('**') || text.includes('```') || text.includes('* '))) {
+        agentResultDiv.innerHTML = marked.parse(text);
+        agentResultDiv.querySelectorAll('pre code').forEach(block => {
+          hljs.highlightElement(block);
+        });
+      } else {
+        agentResultDiv.textContent = text || 'No result.';
+      }
+    };
+    document.getElementById('btnExtractLocal').onclick = async function() {
+      const code = document.getElementById('codeInput').value;
+      const localResultDiv = document.getElementById('localResult');
+      localResultDiv.textContent = 'Extracting...';
+      // Only send if code is non-empty, else show error
+      if (code && code.trim().length > 0) {
+        // Use filename or default program name
+        const programName = 'FromTextArea';
+        const payload = { cobol_code: code, program_name: programName };
+        localResultDiv.textContent = 'Sending payload: ' + JSON.stringify(payload, null, 2);
+        const result = await fetchJson('POST', '/analyze-text', payload);
+        localResultDiv.textContent += '\nRaw response: ' + JSON.stringify(result, null, 2);
+        if (result.error) {
+          localResultDiv.textContent += `\nError: ${result.error}`;
+        } else {
+          localResultDiv.textContent += '\nParsed result: ' + JSON.stringify(result, null, 2);
+        }
+      } else {
+        localResultDiv.textContent = 'Error: No code provided.';
+      }
+    };
+  </script>
+</body>
+</html>

@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>COBOL Requirements Extraction — UI</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 0; margin: 0; background-color: #f8f9fa; height: 100vh; overflow: hidden; }
+    .container { width: 100vw; margin: 0; padding: 20px; box-sizing: border-box; height: 100vh; display: flex; flex-direction: column; }
+    .header { text-align: left; margin-bottom: 20px; flex-shrink: 0; }
+    .header h1 { color: #2c3e50; margin-bottom: 5px; font-size: 1.5em; }
+    .header p { color: #6c757d; font-size: 0.9em; }
+    .row { margin-bottom: 20px; }
+    .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 20px; }
+    .card h3 { margin-top: 0; color: #495057; }
+    label { display: block; font-weight: bold; margin-bottom: 8px; color: #495057; }
+    input[type="text"], textarea, select { width: 100%; padding: 10px; box-sizing: border-box; border: 1px solid #ced4da; border-radius: 4px; }
+    button { padding: 10px 20px; margin-right: 10px; margin-bottom: 10px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+    button:hover { background-color: #0056b3; }
+    button.secondary { background-color: #6c757d; }
+    button.secondary:hover { background-color: #545b62; }
+    pre { background: #f8f9fa; padding: 15px; overflow: auto; max-height: 400px; border-radius: 4px; border: 1px solid #e9ecef; }
+    .upload-area { border: 2px dashed #ced4da; border-radius: 8px; padding: 30px; text-align: center; background-color: #f8f9fa; }
+    .upload-area.dragover { border-color: #007bff; background-color: #e3f2fd; }
+    .two-column { display: flex; gap: 20px; width: 100%; align-items: flex-start; flex: 1; min-height: 0; }
+    .column:first-child {
+      flex-basis: 40%;
+      max-width: 40%;
+      min-width: 0;
+      margin-left: 0;
+      padding-left: 0;
+      height: 100%;
+    }
+    .column:last-child {
+      flex-basis: 55%;
+      max-width: 55%;
+      min-width: 0;
+      margin-right: 0;
+      padding-right: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      height: 100%;
+    }
+    #resultsRightPane {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+      border: 1px solid #ced4da;
+      margin: 0;
+      overflow: hidden;
+    }
+    #resultsRightPaneHeader {
+      background: #007bff;
+      color: #fff;
+      padding: 10px 16px;
+      font-weight: bold;
+      border-bottom: 1px solid #e9ecef;
+      font-size: 1.1em;
+      flex-shrink: 0;
+    }
+    #resultsRightPaneBody {
+      flex: 0.7;
+      padding: 12px;
+      overflow-y: auto;
+      background: #f8f9fa;
+      font-size: 1em;
+      min-height: 200px;
+    }
+    #resultsRightPaneHistory {
+      background: #f4f6fa;
+      border-top: 1px solid #e9ecef;
+      padding: 8px;
+      flex: 0.3;
+      min-height: 150px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .history-title {
+      font-weight: bold;
+      padding: 8px 12px;
+      background: #e9ecef;
+      border-radius: 4px;
+      margin-bottom: 8px;
+      color: #495057;
+    }
+    .history-item {
+      width: 100%;
+      padding: 8px 12px;
+      border: none;
+      background: none;
+      text-align: left;
+      cursor: pointer;
+      font-size: 0.98em;
+      color: #333;
+      border-radius: 4px;
+      margin-bottom: 2px;
+      transition: background 0.15s;
+    }
+    .history-item.selected, .history-item:hover {
+      background: #e3f2fd;
+      color: #007bff;
+    }
+    /* Remove popup styles since we're using right pane */
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🏗️ COBOL Requirements Extraction System</h1>
+      <p>Extract and analyze business requirements from legacy COBOL programs using vector similarity search</p>
+    </div>
+
+    <div class="two-column">
+      <div class="column">
+        <!-- File Upload Section -->
+        <div class="card">
+          <h3>📁 Upload COBOL Files</h3>
+          <div class="upload-area" id="uploadArea">
+            <input type="file" id="fileInput" accept=".cbl,.cob,.cobol,.CBL,.COB,.txt" style="display: none;" />
+            <p>🔼 Click here or drag & drop COBOL files</p>
+            <p style="font-size: 0.9em; color: #6c757d;">Supported: .cbl, .cob, .cobol, .CBL, .COB, .txt</p>
+            <button type="button" onclick="document.getElementById('fileInput').click()">Choose Files</button>
+          </div>
+        </div>
+
+        <!-- Text Analysis Section --->
+        <div class="card">
+          <h3>📝 Analyze COBOL Code</h3>
+          <div class="row">
+            <label>Program Name</label>
+            <input type="text" id="programName" placeholder="e.g., CUSTVAL" value="SAMPLE-PROGRAM" />
+          </div>
+          <div class="row">
+            <label>COBOL Code</label>
+            <textarea id="cobolCode" rows="8" placeholder="Paste COBOL program code here...">       IDENTIFICATION DIVISION.
+       PROGRAM-ID. CUSTVAL.
+      * BUSINESS RULE: Validate customer data
+       DATA DIVISION.
+       01 CUSTOMER-REC.
+          05 CUST-ID     PIC 9(6).
+          05 CUST-NAME   PIC X(30).
+       PROCEDURE DIVISION.
+       MAIN-PROCESS.
+           IF CUST-ID IS NUMERIC
+              DISPLAY 'VALID CUSTOMER'
+           ELSE
+              DISPLAY 'INVALID CUSTOMER'
+           END-IF.
+           STOP RUN.</textarea>
+          </div>
+          <button id="btnAnalyzeText">🔍 Analyze Code</button>
+        </div>
+
+        <!-- Search Section -->
+        <div class="card">
+          <h3>🔎 Search Requirements</h3>
+          <div class="row">
+            <label>Search Query</label>
+            <input type="text" id="searchQuery" placeholder="e.g., customer validation, credit limit, file processing" />
+          </div>
+          <div class="row">
+            <label>Results Limit</label>
+            <select id="searchLimit">
+              <option value="3">3 results</option>
+              <option value="5" selected>5 results</option>
+              <option value="10">10 results</option>
+            </select>
+          </div>
+          <button id="btnSearch">🔍 Search</button>
+          <button id="btnListAll" class="secondary">📋 List All</button>
+          <button id="btnStats" class="secondary">📊 Stats</button>
+        </div>
+      </div>
+
+      <div class="column">
+        <div id="resultsRightPane">
+          <div id="resultsRightPaneHeader">📊 Results History</div>
+          <div id="resultsRightPaneBody">Ready to analyze COBOL programs...</div>
+          <div id="resultsRightPaneHistory">
+            <div class="history-title">📋 History</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const base = '';
+    // Popup chat pane logic
+let resultsRightPaneBody = document.getElementById('resultsRightPaneBody');
+let resultsRightPaneHistory = document.getElementById('resultsRightPaneHistory');
+let resultsHistory = [];
+let selectedHistoryIdx = 0;
+
+function formatTimestamp() {
+  return new Date().toLocaleString();
+}
+
+function updateHistoryList() {
+  if (!resultsRightPaneHistory) return;
+  // Clear existing history items (but keep the title)
+  const titleEl = resultsRightPaneHistory.querySelector('.history-title');
+  resultsRightPaneHistory.innerHTML = '';
+  if (titleEl) resultsRightPaneHistory.appendChild(titleEl);
+  else resultsRightPaneHistory.innerHTML = '<div class="history-title">📋 History</div>';
+  
+  resultsHistory.forEach((item, idx) => {
+    const btn = document.createElement('button');
+    btn.className = 'history-item' + (idx === selectedHistoryIdx ? ' selected' : '');
+    btn.innerHTML = `<div><b>${item.actionName}</b></div><div style="font-size:0.85em;color:#888;">${item.timestamp}</div>`;
+    btn.onclick = () => {
+      selectedHistoryIdx = idx;
+      updateHistoryList();
+      showHistoryItem(idx);
+    };
+    resultsRightPaneHistory.appendChild(btn);
+  });
+}
+
+function showHistoryItem(idx) {
+  if (!resultsRightPaneBody || !resultsHistory[idx]) return;
+  const item = resultsHistory[idx];
+  resultsRightPaneBody.innerHTML = `<div style="margin-bottom:10px;"><b>${item.actionName}</b> <span style="color:#888;font-size:0.9em;">${item.timestamp}</span><pre style="background:#fff;border-radius:6px;padding:8px 10px;margin:6px 0 0 0;">${item.data}</pre></div>`;
+}
+
+function displayResult(actionName, data) {
+  const timestamp = formatTimestamp();
+  const item = {
+    actionName,
+    timestamp,
+    data: JSON.stringify(data, null, 2)
+  };
+  resultsHistory.unshift(item);
+  if (resultsHistory.length > 30) resultsHistory.length = 30;
+  selectedHistoryIdx = 0;
+  updateHistoryList();
+  showHistoryItem(0);
+}
+    function formatTimestamp() {
+      return new Date().toLocaleString();
+    }
+
+    async function fetchJson(method, path, body, isFormData = false) {
+      const opts = { method, headers: {} };
+      if (body && method !== 'GET') {
+        if (isFormData) {
+          opts.body = body;
+        } else {
+          opts.headers['Content-Type'] = 'application/json';
+          opts.body = JSON.stringify(body);
+        }
+      }
+      
+      try {
+        const res = await fetch(base + path, opts);
+        const contentType = res.headers.get('content-type') || '';
+        if (contentType.includes('application/json')) {
+          return await res.json();
+        }
+        return await res.text();
+      } catch (error) {
+        return { error: error.toString() };
+      }
+    }
+
+    // File Upload Handling
+    const uploadArea = document.getElementById('uploadArea');
+    const fileInput = document.getElementById('fileInput');
+
+    uploadArea.addEventListener('click', () => fileInput.click());
+
+    uploadArea.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadArea.classList.add('dragover');
+    });
+
+    uploadArea.addEventListener('dragleave', () => {
+      uploadArea.classList.remove('dragover');
+    });
+
+    uploadArea.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadArea.classList.remove('dragover');
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        handleFileUpload(files[0]);
+      }
+    });
+
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files.length > 0) {
+        handleFileUpload(e.target.files[0]);
+      }
+    });
+
+    async function handleFileUpload(file) {
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      displayResult('File Upload Started', { fileName: file.name, size: file.size });
+      
+      const result = await fetchJson('POST', '/upload-cobol', formData, true);
+      displayResult('File Upload Result', result);
+    }
+
+    // Analyze Text Button
+    document.getElementById('btnAnalyzeText').addEventListener('click', async () => {
+      const programName = document.getElementById('programName').value.trim();
+      const cobolCode = document.getElementById('cobolCode').value.trim();
+      
+      if (!cobolCode) {
+        displayResult('Analysis Error', { error: 'COBOL code cannot be empty' });
+        return;
+      }
+      
+      const body = {
+        program_name: programName || 'UNNAMED',
+        cobol_code: cobolCode
+      };
+      
+      displayResult('Text Analysis Started', { program: programName });
+      const result = await fetchJson('POST', '/analyze-text', body);
+      displayResult('Text Analysis Result', result);
+    });
+
+    // Search Button
+    document.getElementById('btnSearch').addEventListener('click', async () => {
+      const query = document.getElementById('searchQuery').value.trim();
+      const limit = parseInt(document.getElementById('searchLimit').value);
+      
+      if (!query) {
+        displayResult('Search Error', { error: 'Search query cannot be empty' });
+        return;
+      }
+      
+      const body = { query, limit };
+      
+      displayResult('Search Started', { query, limit });
+      const result = await fetchJson('POST', '/search-requirements', body);
+      displayResult('Search Results', result);
+    });
+
+    // List All Button
+    document.getElementById('btnListAll').addEventListener('click', async () => {
+      displayResult('Listing All Requirements', {});
+      const result = await fetchJson('GET', '/list-all-requirements');
+      displayResult('All Requirements', result);
+    });
+
+    // Stats Button
+    document.getElementById('btnStats').addEventListener('click', async () => {
+      displayResult('Getting Statistics', {});
+      const result = await fetchJson('GET', '/stats');
+      displayResult('Statistics', result);
+    });
+
+    // Health Check on Load
+    window.addEventListener('load', async () => {
+      displayResult('Health Check', {});
+      const health = await fetchJson('GET', '/health');
+      displayResult('System Health', health);
+    });
+
+    // Sample queries for quick testing
+    const sampleQueries = [
+      'customer validation logic',
+      'credit limit checking',
+      'file processing operations',
+      'data validation rules',
+      'business logic patterns'
+    ];
+
+    // Add click handlers for quick query insertion
+    document.getElementById('searchQuery').addEventListener('focus', function() {
+      if (!this.value) {
+        this.placeholder = sampleQueries[Math.floor(Math.random() * sampleQueries.length)];
+      }
+    });
+  </script>
+</body>
+</html>
