@@ -1,0 +1,31 @@
+# COBOL Requirements Extraction Project
+# Dependencies for extracting and analyzing business requirements from COBOL programs
+
+# Core dependencies
+fastapi==0.104.1
+uvicorn==0.24.0
+python-multipart==0.0.6
+
+# Vector database and ML
+qdrant-client==1.7.0
+sentence-transformers==2.2.2
+numpy==1.24.3
+pandas==2.0.3
+
+# Text processing and NLP
+nltk==3.8.1
+regex==2023.10.3
+
+# Visualization and analysis
+matplotlib==3.7.2
+seaborn==0.12.2
+wordcloud==1.9.2
+
+# Development and utility
+pathlib2==2.3.7
+typing-extensions==4.8.0
+pydantic==2.5.0
+
+# Optional: Jupyter for notebook analysis
+jupyter==1.0.0
+ipython==8.15.0

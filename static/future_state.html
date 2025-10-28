@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Knowledge Base Explorer</title>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #333; 
+      line-height: 1.6;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .container { 
+      max-width: 1400px; 
+      margin: 0 auto; 
+      background: rgba(255,255,255,0.95); 
+      border-radius: 12px; 
+      padding: 30px; 
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      border-bottom: 2px solid #007bff;
+      padding-bottom: 15px;
+    }
+    .header h1 {
+      color: #007bff;
+      font-size: 2em;
+      margin: 0;
+    }
+    .nav-button {
+      background: #17a2b8;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+      text-decoration: none;
+      display: inline-block;
+      transition: background 0.3s;
+    }
+    .nav-button:hover {
+      background: #138496;
+    }
+    .analysis-section {
+      margin-bottom: 30px;
+      padding: 20px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      border-left: 4px solid #007bff;
+    }
+    .input-section {
+      margin-bottom: 25px;
+    }
+    .input-section h3 {
+      color: #007bff;
+      margin-bottom: 10px;
+    }
+    .input-box {
+      width: 100%;
+      min-height: 120px;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+      resize: vertical;
+    }
+    .input-box:focus {
+      outline: none;
+      border-color: #007bff;
+      box-shadow: 0 0 5px rgba(0,123,255,0.3);
+    }
+    .button-group {
+      display: flex;
+      gap: 10px;
+      margin: 15px 0;
+    }
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.3s;
+    }
+    .btn-primary {
+      background: #007bff;
+      color: white;
+    }
+    .btn-primary:hover:not(:disabled) {
+      background: #0056b3;
+    }
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .btn-success {
+      background: #28a745;
+      color: white;
+    }
+    .btn-success:hover:not(:disabled) {
+      background: #218838;
+    }
+    .btn-success:disabled {
+      background: #6c757d;
+    }
+    .results-section {
+      display: none;
+      margin-top: 25px;
+    }
+    .results-header {
+      background: #e9ecef;
+      padding: 15px;
+      border-radius: 5px 5px 0 0;
+      border-bottom: 2px solid #007bff;
+    }
+    .results-header h3 {
+      color: #007bff;
+      margin: 0;
+    }
+    .results-dropdown {
+      width: 100%;
+      padding: 10px;
+      margin: 15px 0;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 14px;
+      background: white;
+    }
+    .comparison-panels {
+      display: none;
+      margin-top: 20px;
+    }
+    .panels-container {
+      display: flex;
+      gap: 20px;
+      margin-top: 15px;
+    }
+    .panel {
+      flex: 1;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      overflow: hidden;
+      background: white;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .panel-header {
+      background: linear-gradient(135deg, #007bff, #0056b3);
+      color: white;
+      padding: 15px;
+      font-weight: bold;
+      text-align: center;
+    }
+    .panel-content {
+      padding: 20px;
+      max-height: 500px;
+      overflow-y: auto;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+    .score-badge {
+      background: #28a745;
+      color: white;
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: bold;
+      margin-left: 10px;
+    }
+    .analysis-insights {
+      margin-top: 20px;
+      padding: 20px;
+      background: #fff3cd;
+      border: 1px solid #ffeaa7;
+      border-radius: 8px;
+    }
+    .analysis-insights h4 {
+      color: #856404;
+      margin-bottom: 10px;
+    }
+    .insight-item {
+      margin: 8px 0;
+      padding: 8px 12px;
+      background: white;
+      border-radius: 4px;
+      border-left: 3px solid #ffc107;
+    }
+    @media (max-width: 768px) {
+      .panels-container {
+        flex-direction: column;
+      }
+      .header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+      }
+      .button-group {
+        flex-wrap: wrap;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>� Knowledge Base Explorer</h1>
+      <a href="agent_extractor.html" class="nav-button">← Back to Agent Extractor</a>
+    </div>
+
+    <div class="analysis-section">
+      <div class="input-section">
+        <h3>📝 Search Query</h3>
+        <p style="margin-bottom: 10px; color: #666; font-size: 14px;">
+          Enter keywords or describe what you're looking for. The system will search the knowledge base and show you similar requirements along with their source code.
+        </p>
+        <textarea id="currentStateInput" class="input-box" 
+                  placeholder="Enter your search query here...
+
+Example:
+- Customer validation process
+- Payment processing workflow  
+- Report generation requirements
+- Data validation rules
+- File processing logic"></textarea>
+      </div>
+
+      <div class="button-group">
+        <button id="btnAnalyze" class="btn btn-primary">🔍 Search Knowledge Base</button>
+        <button id="btnClear" class="btn" style="background: #6c757d; color: white;">🗑️ Clear</button>
+      </div>
+    </div>
+
+    <div id="resultsSection" class="results-section">
+      <div class="results-header">
+        <h3>📊 Search Results</h3>
+      </div>
+      
+      <select id="resultsDropdown" class="results-dropdown">
+        <option value="">-- Select a requirement to view details --</option>
+      </select>
+
+      <div id="comparisonPanels" class="comparison-panels">
+        <div class="panels-container">
+          <div class="panel">
+            <div class="panel-header">
+              📋 Current State (From Knowledge Base)
+            </div>
+            <div id="currentStatePanel" class="panel-content"></div>
+          </div>
+          
+          <div class="panel">
+            <div class="panel-header">
+              � Source Code
+            </div>
+            <div id="sourceCodePanel" class="panel-content"></div>
+          </div>
+        </div>
+
+        <div class="analysis-insights">
+          <h4>💡 Analysis Insights</h4>
+          <div id="insightsContent">
+            <div class="insight-item">
+              <strong>Similarity Score:</strong> <span id="similarityScore">--</span>
+            </div>
+            <div class="insight-item">
+              <strong>Source Language:</strong> <span id="sourceLanguage">--</span>
+            </div>
+            <div class="insight-item">
+              <strong>Recommendation:</strong> <span id="recommendation">Select a requirement above to see recommendations</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Future State Generation Section -->
+        <div id="futureStateGeneration" style="display: none; margin-top: 25px;">
+          <div class="analysis-section">
+            <h3 style="color: #007bff; margin-bottom: 15px;">🚀 Generate Future State</h3>
+            
+            <div class="input-section">
+              <h4>🎯 Business Constraints</h4>
+              <textarea id="businessConstraints" class="input-box" style="min-height: 100px;"
+                        placeholder="Enter business constraints and requirements...
+
+Examples:
+- Budget limitations: $50K maximum
+- Timeline: Must complete within 6 months
+- Compliance: Must meet SOX requirements
+- Performance: Response time < 2 seconds
+- Scalability: Support 10,000 concurrent users"></textarea>
+            </div>
+
+            <div class="input-section">
+              <h4>🏗️ Architecture & Target Preferences</h4>
+              <textarea id="architecturePrefs" class="input-box" style="min-height: 100px;"
+                        placeholder="Enter architecture and technology preferences...
+
+Examples:
+- Cloud Platform: Azure/AWS/GCP
+- Technology Stack: .NET Core, React, PostgreSQL
+- Architecture Pattern: Microservices, Event-driven
+- Security Requirements: OAuth 2.0, encryption at rest
+- Integration: REST APIs, message queues"></textarea>
+            </div>
+
+            <div class="button-group">
+              <button id="btnGenerateFutureState" class="btn" disabled 
+                      style="background: #28a745; color: white; font-weight: bold;">
+                🚀 Generate Future State Recommendations
+              </button>
+            </div>
+          </div>
+
+          <!-- Generated Future State Results -->
+          <div id="futureStateResults" style="display: none; margin-top: 20px;">
+            <div class="results-header">
+              <h3>🎯 Generated Future State</h3>
+            </div>
+            <div id="futureStateContent" class="panel-content" style="background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 20px; margin-top: 15px;">
+              <!-- Generated content will appear here -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Utility function for API calls
+    async function fetchJson(method, url, data = null) {
+      const options = {
+        method: method,
+        headers: { 'Content-Type': 'application/json' }
+      };
+      if (data) options.body = JSON.stringify(data);
+      const response = await fetch(url, options);
+      return await response.json();
+    }
+
+    // Global variables to store search results
+    let searchResults = [];
+    let currentStateText = '';
+    let selectedRequirement = null;
+    let selectedSourceCode = null;
+
+    // Clear functionality
+    document.getElementById('btnClear').onclick = function() {
+      document.getElementById('currentStateInput').value = '';
+      document.getElementById('businessConstraints').value = '';
+      document.getElementById('architecturePrefs').value = '';
+      document.getElementById('resultsSection').style.display = 'none';
+      document.getElementById('comparisonPanels').style.display = 'none';
+      document.getElementById('futureStateGeneration').style.display = 'none';
+      document.getElementById('futureStateResults').style.display = 'none';
+      document.getElementById('btnGenerateFutureState').disabled = true;
+      searchResults = [];
+      selectedRequirement = null;
+      selectedSourceCode = null;
+    };
+
+    // Main analysis function
+    document.getElementById('btnAnalyze').onclick = async function() {
+      const analyzeBtn = document.getElementById('btnAnalyze');
+      const currentStateInput = document.getElementById('currentStateInput');
+      const resultsSection = document.getElementById('resultsSection');
+      const resultsDropdown = document.getElementById('resultsDropdown');
+      const comparisonPanels = document.getElementById('comparisonPanels');
+      
+      currentStateText = currentStateInput.value.trim();
+      
+      if (!currentStateText) {
+        alert('Please enter your current state description.');
+        return;
+      }
+
+      analyzeBtn.disabled = true;
+      analyzeBtn.textContent = '🔍 Searching...';
+      resultsSection.style.display = 'block';
+      comparisonPanels.style.display = 'none';
+      
+      // Clear previous results
+      resultsDropdown.innerHTML = '<option value="">-- Searching knowledge base... --</option>';
+      searchResults = [];
+
+      try {
+        const result = await fetchJson('POST', '/search-vector-db', {
+          query: currentStateText,
+          limit: 15  // Get more results for better comparison
+        });
+
+        if (result.error) {
+          resultsDropdown.innerHTML = `<option value="">Error: ${result.error}</option>`;
+        } else if (result.results && result.results.length > 0) {
+          searchResults = result.results;
+          
+          // Populate dropdown with results
+          resultsDropdown.innerHTML = '<option value="">-- Select a requirement to view details --</option>';
+          
+          result.results.forEach((item, index) => {
+            const option = document.createElement('option');
+            option.value = index;
+            const preview = item.requirement.substring(0, 120).replace(/\n/g, ' ');
+            option.textContent = `Score: ${item.score.toFixed(3)} | ${preview}...`;
+            resultsDropdown.appendChild(option);
+          });
+          
+          // Add summary
+          const summaryOption = document.createElement('option');
+          summaryOption.disabled = true;
+          summaryOption.textContent = `Found ${result.results.length} matching requirements`;
+          resultsDropdown.insertBefore(summaryOption, resultsDropdown.children[1]);
+          
+        } else {
+          resultsDropdown.innerHTML = '<option value="">No matching requirements found in knowledge base</option>';
+        }
+      } catch (error) {
+        resultsDropdown.innerHTML = `<option value="">Error: ${error.message}</option>`;
+      }
+
+      analyzeBtn.disabled = false;
+      analyzeBtn.textContent = '🔍 Search Knowledge Base';
+    };
+
+    // Handle dropdown selection for comparison
+    document.getElementById('resultsDropdown').onchange = function() {
+      const selectedIndex = this.value;
+      const comparisonPanels = document.getElementById('comparisonPanels');
+      const currentStatePanel = document.getElementById('currentStatePanel');
+      const sourceCodePanel = document.getElementById('sourceCodePanel');
+      const similarityScore = document.getElementById('similarityScore');
+      const sourceLanguage = document.getElementById('sourceLanguage');
+      const recommendation = document.getElementById('recommendation');
+      const futureStateGeneration = document.getElementById('futureStateGeneration');
+      const btnGenerateFutureState = document.getElementById('btnGenerateFutureState');
+      
+      if (selectedIndex === '' || !searchResults[selectedIndex]) {
+        comparisonPanels.style.display = 'none';
+        futureStateGeneration.style.display = 'none';
+        btnGenerateFutureState.disabled = true;
+        selectedRequirement = null;
+        selectedSourceCode = null;
+        return;
+      }
+      
+      const selectedResult = searchResults[selectedIndex];
+      
+      // Store selected data globally
+      selectedRequirement = selectedResult.requirement || 'No requirement text available';
+      selectedSourceCode = selectedResult.source_code || 'No source code available';
+      
+      // Display selected requirement from knowledge base as current state
+      currentStatePanel.textContent = selectedRequirement;
+      
+      // Display corresponding source code
+      sourceCodePanel.textContent = selectedSourceCode;
+      
+      // Update insights
+      similarityScore.textContent = `${(selectedResult.score * 100).toFixed(1)}%`;
+      sourceLanguage.textContent = selectedResult.language || 'Unknown';
+      
+      // Generate recommendation based on similarity score
+      let recommendationText = '';
+      if (selectedResult.score > 0.8) {
+        recommendationText = 'High similarity! This requirement could serve as an excellent reference for your analysis.';
+      } else if (selectedResult.score > 0.6) {
+        recommendationText = 'Moderate similarity. Consider reviewing the patterns and structure in this requirement.';
+      } else if (selectedResult.score > 0.4) {
+        recommendationText = 'Some similarity found. May provide useful context for your current state analysis.';
+      } else {
+        recommendationText = 'Low similarity, but may still offer insights into alternative approaches or structures.';
+      }
+      recommendation.textContent = recommendationText;
+      
+      // Show comparison panels and future state generation section
+      comparisonPanels.style.display = 'block';
+      futureStateGeneration.style.display = 'block';
+      
+      // Enable future state generation button
+      btnGenerateFutureState.disabled = false;
+      btnGenerateFutureState.style.background = '#28a745';
+      
+      // Auto-scroll to top of panels
+      currentStatePanel.scrollTop = 0;
+      sourceCodePanel.scrollTop = 0;
+    };
+
+    // Generate Future State functionality
+    document.getElementById('btnGenerateFutureState').onclick = async function() {
+      const generateBtn = document.getElementById('btnGenerateFutureState');
+      const businessConstraints = document.getElementById('businessConstraints').value.trim();
+      const architecturePrefs = document.getElementById('architecturePrefs').value.trim();
+      const futureStateResults = document.getElementById('futureStateResults');
+      const futureStateContent = document.getElementById('futureStateContent');
+
+      if (!selectedRequirement || !selectedSourceCode) {
+        alert('Please select a requirement from the dropdown first.');
+        return;
+      }
+
+      generateBtn.disabled = true;
+      generateBtn.textContent = '🚀 Generating Future State...';
+      generateBtn.style.background = '#6c757d';
+      
+      futureStateResults.style.display = 'block';
+      futureStateContent.innerHTML = '<div style="text-align: center; color: #666;">🔄 Analyzing and generating future state recommendations...</div>';
+
+      try {
+        const payload = {
+          current_state: selectedRequirement,
+          source_code: selectedSourceCode,
+          business_constraints: businessConstraints || 'No specific constraints provided',
+          architecture_preferences: architecturePrefs || 'No specific preferences provided',
+          search_query: currentStateText
+        };
+
+        const result = await fetchJson('POST', '/generate-future-state', payload);
+
+        if (result.error) {
+          futureStateContent.innerHTML = `<div style="color: red;">❌ Error: ${result.error}</div>`;
+        } else if (result.future_state) {
+          // Display the generated future state with markdown formatting
+          const markdownContent = marked.parse(result.future_state);
+          futureStateContent.innerHTML = `
+            <div class="future-state-content" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6;">
+              ${markdownContent}
+            </div>
+          `;
+          
+          // Add some styling for better readability
+          const style = document.createElement('style');
+          style.textContent = `
+            .future-state-content h1, .future-state-content h2, .future-state-content h3 {
+              color: #007bff;
+              border-bottom: 2px solid #e9ecef;
+              padding-bottom: 8px;
+              margin-top: 25px;
+              margin-bottom: 15px;
+            }
+            .future-state-content h4, .future-state-content h5, .future-state-content h6 {
+              color: #495057;
+              margin-top: 20px;
+              margin-bottom: 10px;
+            }
+            .future-state-content ul, .future-state-content ol {
+              margin-left: 20px;
+              margin-bottom: 15px;
+            }
+            .future-state-content li {
+              margin-bottom: 5px;
+            }
+            .future-state-content p {
+              margin-bottom: 12px;
+            }
+            .future-state-content code {
+              background: #f8f9fa;
+              padding: 2px 6px;
+              border-radius: 3px;
+              font-family: 'Courier New', monospace;
+            }
+            .future-state-content pre {
+              background: #f8f9fa;
+              padding: 15px;
+              border-radius: 5px;
+              overflow-x: auto;
+              border-left: 4px solid #007bff;
+            }
+            .future-state-content blockquote {
+              border-left: 4px solid #007bff;
+              background: #f4f8ff;
+              margin: 15px 0;
+              padding: 10px 15px;
+              font-style: italic;
+            }
+            .future-state-content table {
+              border-collapse: collapse;
+              width: 100%;
+              margin: 15px 0;
+            }
+            .future-state-content th, .future-state-content td {
+              border: 1px solid #dee2e6;
+              padding: 8px 12px;
+              text-align: left;
+            }
+            .future-state-content th {
+              background: #f8f9fa;
+              font-weight: bold;
+            }
+          `;
+          document.head.appendChild(style);
+        } else {
+          futureStateContent.innerHTML = '<div style="color: orange;">⚠️ No future state generated. Please try again.</div>';
+        }
+      } catch (error) {
+        futureStateContent.innerHTML = `<div style="color: red;">❌ Error: ${error.message}</div>`;
+      }
+
+      generateBtn.disabled = false;
+      generateBtn.textContent = '🚀 Generate Future State Recommendations';
+      generateBtn.style.background = '#28a745';
+    };
+  </script>
+</body>
+</html>

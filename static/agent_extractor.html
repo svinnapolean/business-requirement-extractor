@@ -1,0 +1,501 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Agent Extractor — Compare LLM & Local Extraction</title>
+  <style>
+    body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 0; background: #f8f9fa; }
+    .container {
+      position: absolute;
+      left: 0; top: 0;
+      width: 100vw;
+      min-width: 0;
+      max-width: 100vw;
+      margin: 0;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    h2 { font-size: 1.3em; margin-bottom: 8px; color: #2c3e50; }
+    .row { margin-bottom: 18px; }
+    textarea { width: 100%; min-height: 120px; padding: 10px; border-radius: 4px; border: 1px solid #ced4da; font-size: 1em; }
+    select, input[type="text"] { padding: 8px; border-radius: 4px; border: 1px solid #ced4da; font-size: 1em; }
+    button { padding: 10px 20px; background: #007bff; color: #fff; border: none; border-radius: 4px; cursor: pointer; margin-right: 10px; }
+    button:hover { background: #0056b3; }
+    button:disabled { background: #6c757d; cursor: not-allowed; }
+    #btnStoreVector { background: #28a745; }
+    #btnStoreVector:hover:not(:disabled) { background: #218838; }
+    #btnSearchVector { background: #17a2b8; }
+    #btnSearchVector:hover:not(:disabled) { background: #138496; }
+    #searchResults { background: #fff; border-radius: 8px; padding: 20px; border: 1px solid #e9ecef; }
+    .results {
+      display: flex;
+      gap: 2%;
+      margin-top: 24px;
+      flex-wrap: nowrap;
+      width: 100%;
+      min-width: 0;
+    }
+    .result-box {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      border: 1px solid #e9ecef;
+      padding: 16px;
+      min-height: 180px;
+      width: 49%;
+      max-width: 49%;
+      min-width: 0;
+      overflow-y: auto;
+      max-height: 60vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .result-box h3 { margin-top: 0; font-size: 1em; color: #007bff; }
+    .chat-markdown { font-size: 1.05em; line-height: 1.7; color: #222; word-break: break-word; }
+    .chat-markdown h1, .chat-markdown h2, .chat-markdown h3 { color: #007bff; margin-top: 1em; }
+    .chat-markdown ul, .chat-markdown ol { margin-left: 1.5em; }
+    .chat-markdown blockquote { border-left: 4px solid #007bff; background: #f4f8ff; margin: 1em 0; padding: 0.5em 1em; color: #555; }
+    .chat-markdown code, .chat-markdown pre { font-family: 'Fira Mono', 'Consolas', 'Menlo', monospace; font-size: 0.98em; background: #f8f9fa; border-radius: 4px; }
+    .chat-markdown pre { padding: 12px; overflow-x: auto; margin: 1em 0; }
+    .chat-markdown table { border-collapse: collapse; width: 100%; margin: 1em 0; }
+    .chat-markdown th, .chat-markdown td { border: 1px solid #e9ecef; padding: 8px; }
+    .chat-markdown th { background: #f4f8ff; }
+    .chat-markdown img { max-width: 100%; border-radius: 4px; }
+    .chat-markdown a { color: #007bff; text-decoration: underline; }
+    @media (max-width: 900px) {
+      .container { padding: 8px; }
+      .results { flex-direction: column; gap: 16px; }
+      .result-box { max-width: 100%; width: 100%; min-width: 0; }
+      .search-panels { flex-direction: column; gap: 15px; }
+      .search-panel { margin-bottom: 10px; }
+    }
+    .agent-chat-row {
+      display: flex; align-items: flex-start; margin-bottom: 18px;
+    }
+    .agent-avatar {
+      width: 38px; height: 38px; border-radius: 50%; background: #007bff; color: #fff;
+      display: flex; align-items: center; justify-content: center; font-size: 1.5em; margin-right: 14px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .agent-bubble {
+      background: #fff; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      border: 1px solid #e9ecef; padding: 18px; min-width: 0; max-width: 900px; width: 100%;
+    }
+    .agent-bubble .chat-markdown { margin: 0; }
+    
+    .search-panels {
+      display: flex;
+      gap: 20px;
+      margin-top: 15px;
+    }
+
+    .search-panel {
+      flex: 1;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      padding: 15px;
+      background-color: #f9f9f9;
+    }
+
+    .search-panel h4 {
+      margin: 0 0 10px 0;
+      color: #333;
+      border-bottom: 2px solid #007cba;
+      padding-bottom: 5px;
+    }
+
+    .panel-content {
+      max-height: 500px;
+      overflow-y: auto;
+      padding: 10px;
+      background-color: white;
+      border: 1px solid #e0e0e0;
+      border-radius: 3px;
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+      line-height: 1.4;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+
+    #searchDropdown {
+      background-color: white;
+      border: 1px solid #ddd;
+      border-radius: 3px;
+      font-size: 14px;
+    }
+
+    #searchDropdown option {
+      padding: 8px;
+    }
+
+    .score-badge {
+      background-color: #007cba;
+      color: white;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 12px;
+      margin-left: 8px;
+    }
+
+    .nav-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #007bff;
+    }
+
+    .nav-button {
+      background: #17a2b8;
+      color: white;
+      padding: 10px 20px;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: 500;
+      transition: background 0.3s;
+      white-space: nowrap;
+    }
+
+    .nav-button:hover {
+      background: #138496;
+    }
+
+    @media (max-width: 768px) {
+      .nav-header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="nav-header">
+      <h2 style="margin: 0; color: #007bff;">Agent Extractor — Compare LLM & Local Extraction</h2>
+      <a href="future_state.html" class="nav-button">
+        � Knowledge Base Explorer
+      </a>
+    </div>
+    <div class="row">
+      <label for="codeInput"><b>Paste COBOL or other program code:</b></label>
+      <textarea id="codeInput" placeholder="Paste your COBOL or other code here..."></textarea>
+    </div>
+    <div class="row">
+      <label for="langSelect">Language:</label>
+      <select id="langSelect">
+        <option value="COBOL">COBOL</option>
+        <option value="Python">Python</option>
+        <option value="Java">Java</option>
+        <option value="Other">Other</option>
+      </select>
+      <button id="btnExtractAgent">Extract via Agent (LLM)</button>
+      <button id="btnExtractLocal">Extract via Local Parser</button>
+      <button id="btnStoreVector" disabled>Store in Vector DB</button>
+    </div>
+    <div class="row">
+      <label for="searchInput"><b>Search Vector Database:</b></label>
+      <textarea id="searchInput" placeholder="Enter search query to find similar requirements..." style="min-height: 60px;"></textarea>
+      <button id="btnSearchVector">Search Requirements</button>
+    </div>
+    <div id="searchResults" style="display: none; margin-top: 20px;">
+      <h3>Search Results</h3>
+      <div class="row">
+        <label for="searchDropdown"><b>Select Result to View:</b></label>
+        <select id="searchDropdown" style="width: 100%; padding: 8px; margin-bottom: 10px;">
+          <option value="">-- Select a search result --</option>
+        </select>
+      </div>
+      <div id="searchDetailView" style="display: none;">
+        <div class="search-panels">
+          <div class="search-panel">
+            <h4>📋 Business Requirement</h4>
+            <div id="requirementPanel" class="panel-content"></div>
+          </div>
+          <div class="search-panel">
+            <h4>💻 Source Code</h4>
+            <div id="sourceCodePanel" class="panel-content"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="results">
+      <div class="result-box" style="max-width: 900px; width: 100%;">
+        <h3>Agent (LLM) Extraction</h3>
+        <div class="agent-chat-row">
+          <div class="agent-avatar" title="Agent">🤖</div>
+          <div class="agent-bubble">
+            <div id="agentResult" class="chat-markdown" style="min-height:180px; width:100%;"></div>
+          </div>
+        </div>
+      </div>
+      <div class="result-box" style="max-width: 900px; width: 100%;">
+        <h3>Local Extraction</h3>
+        <pre id="localResult">No results yet.</pre>
+      </div>
+    </div>
+  </div>
+  <!-- Render Markdown using marked.js and highlight.js for code blocks -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/highlight.min.js"></script>
+  <script>
+    async function fetchJson(method, url, body) {
+      let opts = { method };
+      if (body) {
+        opts.body = JSON.stringify(body);
+        opts.headers = { 'Content-Type': 'application/json' };
+      }
+      const resp = await fetch(url, opts);
+      // Try to parse JSON, else return error
+      let result;
+      try {
+        result = await resp.json();
+      } catch (e) {
+        result = { error: 'Invalid response from server', status: resp.status };
+      }
+      // If status is not 200, include status and error
+      if (!resp.ok) {
+        result.error = result.error || `HTTP ${resp.status} ${resp.statusText}`;
+      }
+      return result;
+    }
+    document.getElementById('btnExtractAgent').onclick = async function() {
+      // Fallback: extract using regex from a raw string pattern like: parts { text: "...." } role: "model"
+      function extractAllTextsFromRawString(raw) {
+        if (!raw || typeof raw !== "string") return "";
+        // Find all text: "..." inside parts { ... }
+        const matches = [];
+        const regex = /parts\s*\{[^}]*?text\s*:\s*"([^"\\]*(?:\\.[^"\\]*)*)"[^}]*?\}/gs;
+        let m;
+        while ((m = regex.exec(raw)) !== null) {
+          matches.push(m[1].replace(/\\"/g, '"').replace(/\\n/g, "\n").replace(/\\t/g, "\t"));
+        }
+        return matches.join("\n\n");
+      }
+      const code = document.getElementById('codeInput').value;
+      const language = document.getElementById('langSelect').value;
+      const agentResultDiv = document.getElementById('agentResult');
+      agentResultDiv.innerHTML = '<em>Extracting...</em>';
+      const result = await fetchJson('POST', '/agent-extract', { code, language });
+      // Robustly extract 'text' from requirements, handling both {parts: [{text: ...}]} and {text: ...} structures
+      let text = '';
+      if (Array.isArray(result.requirements) && result.requirements.length > 0) {
+        const req = result.requirements[0];
+        // If response shape is { parts: [{ text: ... }] }, concatenate all parts' text
+        if (req && Array.isArray(req.parts) && req.parts.length > 0) {
+          text = req.parts.map(p => typeof p.text === 'string' ? p.text : '').join('\n');
+        }
+        // If response shape is { text: ... }, use text
+        else if (req && typeof req.text === 'string') {
+          text = req.text;
+        }
+      } else if (typeof result.requirements === 'object' && result.requirements !== null) {
+        // If requirements is an object with parts array, concatenate all parts' text
+        if (Array.isArray(result.requirements.parts) && result.requirements.parts.length > 0) {
+          text = result.requirements.parts.map(p => typeof p.text === 'string' ? p.text : '').join('\n');
+        }
+        // If requirements is an object with text field
+        else if (typeof result.requirements.text === 'string') {
+          text = result.requirements.text;
+        }
+      } else if (typeof result.requirements === 'string') {
+        text = result.requirements;
+        // Fallback: try to extract from raw string if it looks like 'parts { text: ... }'
+        if (text.includes('parts') && text.includes('text:')) {
+          const extracted = extractAllTextsFromRawString(text);
+          if (extracted) text = extracted;
+        }
+      }
+      // Remove 'markdown\n' prefix if present
+      if (typeof text === 'string' && text.startsWith('markdown\n')) {
+        text = text.replace(/^markdown\n/, '');
+      }
+      // Store extracted text globally for vector DB storage
+      window.lastExtractedRequirements = text;
+      window.lastSourceCode = code;
+      window.lastLanguage = language;
+      
+      // Enable the Store in Vector DB button if we have results
+      const storeBtn = document.getElementById('btnStoreVector');
+      if (text && text.trim()) {
+        storeBtn.disabled = false;
+        storeBtn.textContent = 'Store in Vector DB';
+      } else {
+        storeBtn.disabled = true;
+        storeBtn.textContent = 'Store in Vector DB';
+      }
+      
+      // Render as markdown if it looks like markdown, else as plain text
+      if (text && (text.includes('#') || text.includes('**') || text.includes('```') || text.includes('* '))) {
+        agentResultDiv.innerHTML = marked.parse(text);
+        agentResultDiv.querySelectorAll('pre code').forEach(block => {
+          hljs.highlightElement(block);
+        });
+      } else {
+        agentResultDiv.textContent = text || 'No result.';
+      }
+    };
+    document.getElementById('btnExtractLocal').onclick = async function() {
+      const code = document.getElementById('codeInput').value;
+      const localResultDiv = document.getElementById('localResult');
+      localResultDiv.textContent = 'Extracting...';
+      // Only send if code is non-empty, else show error
+      if (code && code.trim().length > 0) {
+        // Use filename or default program name
+        const programName = 'FromTextArea';
+        const payload = { cobol_code: code, program_name: programName };
+        localResultDiv.textContent = 'Sending payload: ' + JSON.stringify(payload, null, 2);
+        const result = await fetchJson('POST', '/analyze-text', payload);
+        localResultDiv.textContent += '\nRaw response: ' + JSON.stringify(result, null, 2);
+        if (result.error) {
+          localResultDiv.textContent += `\nError: ${result.error}`;
+        } else {
+          localResultDiv.textContent += '\nParsed result: ' + JSON.stringify(result, null, 2);
+        }
+      } else {
+        localResultDiv.textContent = 'Error: No code provided.';
+      }
+    };
+    
+    document.getElementById('btnStoreVector').onclick = async function() {
+      const storeBtn = document.getElementById('btnStoreVector');
+      const requirements = window.lastExtractedRequirements;
+      const sourceCode = window.lastSourceCode;
+      const language = window.lastLanguage;
+      
+      if (!requirements || !requirements.trim()) {
+        alert('No requirements to store. Please extract requirements first.');
+        return;
+      }
+      
+      storeBtn.disabled = true;
+      storeBtn.textContent = 'Storing...';
+      
+      try {
+        const payload = {
+          requirements: requirements,
+          source_code: sourceCode,
+          language: language || "COBOL",  // Include language parameter
+          program_name: `${language}_Program_${Date.now()}`
+        };
+        
+        const result = await fetchJson('POST', '/store-in-vector-db', payload);
+        
+        if (result.error) {
+          alert(`Error storing in vector DB: ${result.error}`);
+          storeBtn.textContent = 'Store in Vector DB';
+        } else {
+          alert(`Success: ${result.message}`);
+          storeBtn.textContent = 'Stored ✓';
+          storeBtn.style.background = '#6c757d';
+          
+          // Reset button after 3 seconds
+          setTimeout(() => {
+            storeBtn.textContent = 'Store in Vector DB';
+            storeBtn.style.background = '#28a745';
+          }, 3000);
+        }
+      } catch (error) {
+        alert(`Error: ${error.message}`);
+        storeBtn.textContent = 'Store in Vector DB';
+      }
+      
+      storeBtn.disabled = false;
+    };
+    
+    // Global array to store search results
+    let searchResultsData = [];
+
+    document.getElementById('btnSearchVector').onclick = async function() {
+      const searchBtn = document.getElementById('btnSearchVector');
+      const searchInput = document.getElementById('searchInput');
+      const searchResults = document.getElementById('searchResults');
+      const searchDropdown = document.getElementById('searchDropdown');
+      const searchDetailView = document.getElementById('searchDetailView');
+      
+      const query = searchInput.value.trim();
+      if (!query) {
+        alert('Please enter a search query.');
+        return;
+      }
+      
+      searchBtn.disabled = true;
+      searchBtn.textContent = 'Searching...';
+      searchResults.style.display = 'block';
+      searchDetailView.style.display = 'none';
+      
+      // Clear previous results
+      searchDropdown.innerHTML = '<option value="">-- Select a search result --</option>';
+      searchResultsData = [];
+      
+      try {
+        const result = await fetchJson('POST', '/search-vector-db', { 
+          query: query, 
+          limit: 10  // Increased limit for more options
+        });
+        
+        if (result.error) {
+          searchDropdown.innerHTML = `<option value="">Error: ${result.error}</option>`;
+        } else if (result.results && result.results.length > 0) {
+          searchResultsData = result.results;
+          
+          // Populate dropdown with search results
+          result.results.forEach((item, index) => {
+            const option = document.createElement('option');
+            option.value = index;
+            option.textContent = `Result ${index + 1} (Score: ${item.score.toFixed(3)}) - ${item.requirement.substring(0, 80)}...`;
+            searchDropdown.appendChild(option);
+          });
+          
+          // Show summary
+          const summaryText = `Found ${result.count} similar requirement(s). Select from dropdown to view details.`;
+          const summaryOption = document.createElement('option');
+          summaryOption.value = '';
+          summaryOption.textContent = summaryText;
+          summaryOption.disabled = true;
+          searchDropdown.insertBefore(summaryOption, searchDropdown.children[1]);
+        } else {
+          searchDropdown.innerHTML = '<option value="">No similar requirements found</option>';
+        }
+      } catch (error) {
+        searchDropdown.innerHTML = `<option value="">Error: ${error.message}</option>`;
+      }
+      
+      searchBtn.disabled = false;
+      searchBtn.textContent = 'Search Requirements';
+    };
+
+    // Handle dropdown selection
+    document.getElementById('searchDropdown').onchange = function() {
+      const selectedIndex = this.value;
+      const searchDetailView = document.getElementById('searchDetailView');
+      const requirementPanel = document.getElementById('requirementPanel');
+      const sourceCodePanel = document.getElementById('sourceCodePanel');
+      
+      if (selectedIndex === '' || !searchResultsData[selectedIndex]) {
+        searchDetailView.style.display = 'none';
+        return;
+      }
+      
+      const selectedResult = searchResultsData[selectedIndex];
+      
+      // Display requirement in left panel
+      requirementPanel.innerHTML = selectedResult.requirement || 'No requirement text available';
+      
+      // Display source code in right panel
+      sourceCodePanel.innerHTML = selectedResult.source_code || 'No source code available';
+      
+      // Show the detail view
+      searchDetailView.style.display = 'block';
+      
+      // Auto-scroll to top of panels
+      requirementPanel.scrollTop = 0;
+      sourceCodePanel.scrollTop = 0;
+    };
+  </script>
+</body>
+</html>

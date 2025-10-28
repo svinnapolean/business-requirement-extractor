@@ -1,0 +1,107 @@
+PROPRIETARY SOFTWARE LICENSE
+
+Business Rule Extractor Agent AI
+Copyright (c) 2025 Vincent Susai (@svinnapolean). All rights reserved.
+GitHub: https://github.com/svinnapolean
+
+PRIVATE LICENSE AGREEMENT
+
+This software and associated documentation files (the "Software") are the exclusive 
+property of Vincent Susai ("Licensor"). This Software is provided under a private, 
+proprietary license and is NOT open source software.
+
+GRANT OF LICENSE:
+Subject to the terms and conditions of this License, Licensor hereby grants to you a 
+limited, non-exclusive, non-transferable, revocable license to use the Software solely 
+for your internal business purposes, subject to the following restrictions:
+
+RESTRICTIONS:
+1. You may NOT distribute, sublicense, sell, rent, lease, or otherwise transfer the 
+   Software or any portion thereof to any third party.
+
+2. You may NOT modify, adapt, alter, translate, or create derivative works based upon 
+   the Software or any portion thereof.
+
+3. You may NOT reverse engineer, disassemble, decompile, or otherwise attempt to 
+   derive the source code of the Software.
+
+4. You may NOT remove, alter, or obscure any proprietary notices, labels, or marks 
+   on the Software.
+
+5. You may NOT use the Software for any commercial purpose without explicit written 
+   permission from the Licensor.
+
+INTELLECTUAL PROPERTY:
+The Software, including but not limited to its algorithms, source code, object code, 
+documentation, user interfaces, and any updates or modifications thereto, contains 
+proprietary and confidential information of Vincent Susai and is protected by 
+copyright, trade secret, and other intellectual property laws.
+
+AI COMPONENTS NOTICE:
+This Software incorporates artificial intelligence components and machine learning 
+models. The training data, algorithms, and AI-generated outputs are proprietary to 
+Vincent Susai and subject to the same restrictions as the Software.
+
+COBOL MODERNIZATION TECHNOLOGY:
+The COBOL parsing algorithms, business rule extraction methods, vector database 
+implementation, and Chain-of-Thought AI prompting techniques contained in this 
+Software are proprietary innovations of Vincent Susai.
+
+CONFIDENTIALITY:
+You acknowledge that the Software contains valuable trade secrets and proprietary 
+information of Vincent Susai. You agree to maintain the confidentiality of the 
+Software and not to disclose any information about the Software to third parties 
+without prior written consent from Vincent Susai.
+
+TERMINATION:
+This License is effective until terminated. Your rights under this License will 
+terminate automatically without notice from Vincent Susai if you fail to comply 
+with any term(s) of this License. Upon termination, you must cease all use of the 
+Software and destroy all copies in your possession or control.
+
+DISCLAIMER OF WARRANTIES:
+THE SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A 
+PARTICULAR PURPOSE, AND NON-INFRINGEMENT. IN NO EVENT SHALL VINCENT SUSAI BE LIABLE 
+FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT, 
+OR OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION WITH THE SOFTWARE OR THE USE 
+OR OTHER DEALINGS IN THE SOFTWARE.
+
+LIMITATION OF LIABILITY:
+IN NO EVENT SHALL VINCENT SUSAI BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, 
+CONSEQUENTIAL, OR PUNITIVE DAMAGES, INCLUDING WITHOUT LIMITATION, LOSS OF PROFITS, 
+DATA, USE, GOODWILL, OR OTHER INTANGIBLE LOSSES, RESULTING FROM YOUR USE OF THE 
+SOFTWARE.
+
+GOVERNING LAW:
+This License shall be governed by and construed in accordance with the laws of the 
+jurisdiction in which Vincent Susai resides, without regard to conflict of law 
+principles.
+
+ENTIRE AGREEMENT:
+This License constitutes the entire agreement between you and Vincent Susai regarding 
+the Software and supersedes all prior or contemporaneous understandings regarding 
+such subject matter.
+
+CONTACT INFORMATION:
+For licensing inquiries, permissions, or other questions regarding this Software, 
+please contact:
+
+Vincent Susai (@svinnapolean)
+GitHub: https://github.com/svinnapolean
+Repository: https://github.com/svinnapolean/business-requirement-extractor
+Issues: https://github.com/svinnapolean/business-requirement-extractor/issues
+
+---
+
+TECHNOLOGY COMPONENTS ATTRIBUTION:
+- FastAPI: Licensed under MIT License
+- Qdrant: Licensed under Apache License 2.0  
+- SentenceTransformers: Licensed under Apache License 2.0
+- OpenAI API: Subject to OpenAI Terms of Service
+- Google Gemini API: Subject to Google AI Terms of Service
+
+The above third-party components retain their respective licenses. This proprietary 
+license applies to the original work, algorithms, and innovations created by Vincent Susai.
+
+Last Updated: October 28, 2025
