@@ -1,10 +1,10 @@
 # Business Rule Extractor Agent AI
 
-Enterprise-grade COBOL requirements extraction and modernization assistant powered by advanced AI agents and vector search technology.
+Enterprise-grade legacy program requirements extraction and modernization assistant powered by advanced AI agents and vector search technology.
 
 ## 🎯 System Overview
 
-This comprehensive AI-powered system modernizes legacy COBOL applications through intelligent business rule extraction, semantic search, and AI-driven future state recommendations. It combines traditional parsing with cutting-edge LLM capabilities to transform legacy codebases into searchable knowledge bases and generate modernization roadmaps.
+This comprehensive AI-powered system modernizes legacy applications through intelligent business rule extraction, semantic search, and AI-driven future state recommendations. It combines traditional parsing with cutting-edge LLM capabilities to transform legacy codebases into searchable knowledge bases and generate modernization roadmaps for any programming language.
 
 ### 🌟 Core Capabilities
 
@@ -20,9 +20,9 @@ This comprehensive AI-powered system modernizes legacy COBOL applications throug
 ## 🏗️ System Architecture
 
 ```
-COBOL Files → AI Agent Extractor → Vector Database → Knowledge Explorer → Future State Generator
-     ↓              ↓                    ↓               ↓                    ↓
- (Legacy Code) → (LLM Analysis) → (Semantic Search) → (Discovery UI) → (Modernization AI)
+Legacy Program Files → AI Agent Extractor → Vector Database → Knowledge Explorer → Future State Generator
+     ↓                    ↓                    ↓               ↓                    ↓
+ (Legacy Code)    → (LLM Analysis)     → (Semantic Search) → (Discovery UI) → (Modernization AI)
 ```
 
 ### Technology Stack
@@ -81,7 +81,7 @@ COBOL Files → AI Agent Extractor → Vector Database → Knowledge Explorer �
 ```
 ├── 🤖 AI Extraction Engine
 │   ├── agent_extractor.py              # LLM-powered business rule extraction
-│   ├── cobol_requirements_extractor.py # Traditional COBOL parsing engine
+│   ├── cobol_requirements_extractor.py # Traditional legacy program parsing engine
 │   └── llm_fallback_client.py          # Multi-provider LLM client with failover
 │
 ├── 🌐 Web Services
@@ -94,10 +94,10 @@ COBOL Files → AI Agent Extractor → Vector Database → Knowledge Explorer �
 │   └── static/index.html               # Legacy simple interface
 │
 ├── 📊 Analysis & Configuration
-│   ├── cobol_requirements_analysis.ipynb # Jupyter analysis notebooks
+│   ├── cobol_requirements_analysis.ipynb # Jupyter analysis notebooks (legacy analysis)
 │   ├── llm_config.json                 # LLM API configuration
 │   ├── requirements.txt                # Python dependencies
-│   └── sample_customer_validation.cbl  # Example COBOL program
+│   └── sample_customer_validation.cbl  # Example legacy program file
 │
 └── 📚 Documentation
     ├── README.md                       # This comprehensive guide
@@ -110,7 +110,7 @@ COBOL Files → AI Agent Extractor → Vector Database → Knowledge Explorer �
 
 **Agent Extractor Interface** (`/static/agent_extractor.html`):
 
-1. Upload COBOL files or paste code directly
+1. Upload legacy program files or paste code directly
 2. AI agents analyze and extract business requirements using LLM intelligence
 3. View structured results with business rules, data definitions, and logic patterns
 4. Results automatically stored in vector database for future search
@@ -143,7 +143,7 @@ COBOL Files → AI Agent Extractor → Vector Database → Knowledge Explorer �
 
 ### Vector Database Capabilities
 
-- **Collection**: `cobol_requirements` with 384-dimensional embeddings
+- **Collection**: `legacy_requirements` with 384-dimensional embeddings
 - **Search**: Semantic similarity with configurable thresholds (0.5-0.95)
 - **Storage**: Persistent across sessions with full metadata
 
@@ -159,7 +159,7 @@ COBOL Files → AI Agent Extractor → Vector Database → Knowledge Explorer �
 | `/search-requirements`   | GET    | Semantic search in vector database      |
 | `/list-all-requirements` | GET    | Retrieve all stored requirements        |
 | `/generate-future-state` | POST   | AI modernization recommendations        |
-| `/upload-cobol`          | POST   | Traditional file upload and parsing     |
+| `/upload-legacy`         | POST   | Traditional file upload and parsing     |
 | `/stats`                 | GET    | System statistics and metrics           |
 
 ### AI Agent Extraction
@@ -168,7 +168,7 @@ COBOL Files → AI Agent Extractor → Vector Database → Knowledge Explorer �
 
 ```json
 {
-  "cobol_code": "IDENTIFICATION DIVISION...",
+  "program_code": "IDENTIFICATION DIVISION...",
   "additional_context": "Customer validation module"
 }
 ```
@@ -217,7 +217,7 @@ COBOL Files → AI Agent Extractor → Vector Database → Knowledge Explorer �
 **Business Rule Extraction**:
 
 ```
-Analyze this COBOL code and extract:
+Analyze this legacy program code and extract:
 1. Business rules and validation logic
 2. Data flow and transformations
 3. Integration points and dependencies
@@ -301,7 +301,7 @@ docker restart <qdrant-container-id>
 
 - Local vector storage (no external data sharing)
 - Configurable data retention policies
-- COBOL code processed locally first
+- Legacy program code processed locally first
 
 ### Access Control
 
@@ -313,9 +313,9 @@ docker restart <qdrant-container-id>
 
 ### Jupyter Analysis Workflow
 
-**File**: `cobol_requirements_analysis.ipynb`
+**File**: `cobol_requirements_analysis.ipynb` (Legacy Program Analysis)
 
-1. **Batch Processing**: Analyze entire COBOL directories
+1. **Batch Processing**: Analyze entire legacy program directories
 2. **Pattern Analysis**: Identify common business rule structures
 3. **Visualization**: Generate insights and trend reports
 4. **Export**: Create modernization documentation
@@ -325,7 +325,7 @@ docker restart <qdrant-container-id>
 **Enhance extraction patterns**:
 
 ```python
-# Add domain-specific COBOL patterns
+# Add domain-specific programming language patterns
 custom_patterns = {
     'validation_rules': r'IF\s+.*\s+NOT\s+VALID',
     'calculation_logic': r'COMPUTE\s+.*\s+ROUNDED',
@@ -343,7 +343,7 @@ from cobol_requirements_api import extract_requirements
 from future_state_generator import generate_roadmap
 
 # Extract from legacy system
-requirements = extract_requirements(cobol_directory)
+requirements = extract_requirements(legacy_directory)
 # Generate modernization plan  
 roadmap = generate_roadmap(requirements, constraints)
 ```
@@ -356,7 +356,7 @@ roadmap = generate_roadmap(requirements, constraints)
 
 ```bash
 # Build application container
-docker build -t cobol-extractor .
+docker build -t legacy-extractor .
 
 # Deploy with docker-compose
 docker-compose up -d
@@ -382,52 +382,11 @@ docker-compose up -d
 - Search query performance
 - AI generation success rates
 
-## 🤝 Contributing
-
-### Development Guidelines
-
-1. **Code Style**: Follow PEP 8 for Python code
-2. **Testing**: Add unit tests for new features
-3. **Documentation**: Update README for major changes
-4. **AI Integration**: Test with both OpenAI and Gemini models
-
-### GitHub Copilot Enhancement
-
-**Optimization Prompts**:
-
-- `# Improve COBOL parsing accuracy for business rules`
-- `// Enhance vector search relevance scoring`
-- `# Add Chain-of-Thought prompt optimization`
-
-### Feature Requests
-
-**Roadmap Items**:
-
-- Multi-language legacy code support
-- Advanced visualization dashboards
-- Enterprise SSO integration
-- Real-time collaborative analysis
-
-## 📞 Support
-
-### Resources
-
-- **Documentation**: Complete API docs at `/docs`
-- **Examples**: Sample COBOL files and analysis notebooks
-- **Community**: GitHub Discussions for Q&A
-
-### Contact
-- **GitHub**: [@svinnapolean](https://github.com/svinnapolean)
-- **Repository**: [business-requirement-extractor](https://github.com/svinnapolean/business-requirement-extractor)
-- **Issues**: [GitHub issue tracker](https://github.com/svinnapolean/business-requirement-extractor/issues)
-- **Enhancements**: [Feature request templates](https://github.com/svinnapolean/business-requirement-extractor/issues/new)
-- **Enterprise**: Contact [@svinnapolean](https://github.com/svinnapolean) for commercial licensing
-
 ---
 
 ## 🎯 Success Stories
 
-Transform your legacy COBOL applications into modern, maintainable systems with AI-powered analysis and intelligent modernization recommendations. This system bridges the gap between legacy expertise and modern architecture, enabling organizations to:
+Transform your legacy applications into modern, maintainable systems with AI-powered analysis and intelligent modernization recommendations. This system bridges the gap between legacy expertise and modern architecture, enabling organizations to:
 
 - **Accelerate Legacy Modernization** with AI-driven business rule extraction
 - **Preserve Business Knowledge** through comprehensive requirement documentation
@@ -435,33 +394,6 @@ Transform your legacy COBOL applications into modern, maintainable systems with 
 - **Reduce Modernization Risk** through systematic requirement traceability
 
 **Start your modernization journey today** with the Business Rule Extractor Agent AI system.
-
-## 📄 License
-
-**Proprietary Software License**
-
-Copyright (c) 2025 Vincent Susai ([@svinnapolean](https://github.com/svinnapolean)). All rights reserved.
-
-This software is private and proprietary. It is NOT open source software. 
-
-**Key License Terms:**
-- ✅ **Internal Business Use**: Permitted for your organization's internal purposes
-- ❌ **No Distribution**: Cannot be shared, sold, or transferred to third parties  
-- ❌ **No Modification**: Source code cannot be altered or derivative works created
-- ❌ **No Reverse Engineering**: Disassembly or decompilation prohibited
-- ❌ **No Commercial Redistribution**: Commercial use requires explicit written permission
-
-**Proprietary Technology:**
-- COBOL parsing algorithms and business rule extraction methods
-- AI agent orchestration and Chain-of-Thought prompting techniques  
-- Vector database implementation and semantic search optimization
-- Multi-LLM fallback architecture and modernization recommendation engine
-
-**Third-Party Components:** FastAPI, Qdrant, SentenceTransformers, and LLM APIs retain their respective licenses.
-
-**Full License**: See `LICENSE` file for complete terms and conditions.
-
-**Contact**: For licensing inquiries, permissions, or commercial use, contact [@svinnapolean](https://github.com/svinnapolean).
 
 ### 3. Search Requirements
 
@@ -535,25 +467,22 @@ The Jupyter notebook (`cobol_requirements_analysis.ipynb`) provides:
 - Fine-tuning tools and feedback collection
 - GitHub Copilot integration examples
 
-## 🔍 Supported COBOL Patterns
+## 🔍 Supported Legacy Programming Patterns
 
 ### Business Logic
-
-- IF-THEN-ELSE statements
-- PERFORM-UNTIL loops
-- COMPUTE operations
-- Data validation rules
+- Conditional statements (IF-THEN-ELSE, CASE, SWITCH)
+- Loop constructs (FOR, WHILE, DO-UNTIL)
+- Mathematical operations and calculations
+- Data validation and business rules
 
 ### Data Structures
+- Variable declarations and data types
+- Record/structure definitions
+- Array and collection patterns
+- File and database record layouts
 
-- PIC clauses and data types
-- Level numbers and hierarchies
-- Working storage definitions
-- File record layouts
-
-### Comments and Requirements
-
-- Business rule comments (starting with *)
+### Comments and Documentation
+- Business rule comments and annotations
 - Requirement specifications
 - Functional descriptions
 - Validation constraints
@@ -578,34 +507,10 @@ The system handles multiple encodings commonly used in legacy systems:
 - ASCII
 - ISO-8859-1
 
-## 🔧 Troubleshooting
-
-### Common Issues
-
-1. **Qdrant Connection Error**
-
-   - Ensure Docker is running: `docker ps`
-   - Check Qdrant status: http://localhost:6333/dashboard
-2. **File Encoding Issues**
-
-   - The system tries multiple encodings automatically
-   - Convert files to UTF-8 if problems persist
-3. **Low Search Results**
-
-   - Lower the similarity threshold
-   - Try different query phrasings
-   - Check if requirements were extracted from uploaded files
-
-### Performance Tips
-
-- Process large COBOL codebases in batches
-- Use parallel processing for directory analysis
-- Adjust embedding chunk sizes for memory efficiency
-
 ## 🚀 Next Steps
 
-1. **Scale for Enterprise**: Batch process entire COBOL codebases
-2. **Custom Patterns**: Adapt extraction patterns for specific COBOL dialects
+1. **Scale for Enterprise**: Batch process entire legacy codebases
+2. **Custom Patterns**: Adapt extraction patterns for specific programming languages and dialects
 3. **Integration**: Connect with documentation and modernization tools
 4. **Reporting**: Generate requirement traceability reports
 5. **Enhancement**: Use GitHub Copilot to continuously improve extraction patterns
@@ -650,12 +555,12 @@ Full license terms available in the `LICENSE` file.
 **Contribution Process:**
 1. **Fork & Branch**: Create feature branch from main
 2. **Develop**: Implement changes following coding standards
-3. **Test**: Verify functionality with sample COBOL files
+3. **Test**: Verify functionality with sample legacy program files
 4. **Document**: Update relevant documentation
 5. **Pull Request**: Submit with detailed description of changes
 
 **Enhancement Areas:**
-- 🔧 **COBOL Parsing**: Improve regex patterns for legacy syntax variations
+- 🔧 **Legacy Parsing**: Improve regex patterns for various programming language syntax variations
 - 🤖 **AI Prompting**: Enhance Chain-of-Thought prompt optimization
 - 🔍 **Vector Search**: Optimize semantic similarity algorithms
 - 🎨 **UI/UX**: Improve web interface design and responsiveness
@@ -663,7 +568,7 @@ Full license terms available in the `LICENSE` file.
 
 **GitHub Copilot Integration:**
 Use these prompts for AI-assisted development:
-- `# Improve COBOL business rule extraction accuracy`
+- `# Improve legacy program business rule extraction accuracy`
 - `// Enhance vector search relevance scoring`
 - `# Optimize Chain-of-Thought prompt structure`
 - `// Add error handling for edge cases`
