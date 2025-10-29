@@ -10,7 +10,7 @@ import tempfile
 import os
 from typing import List, Dict
 
-app = FastAPI(title="COBOL Requirements Extraction API", version="1.0")
+app = FastAPI(title="Requirements Extraction API", version="1.0")
 
 app.add_middleware(
     CORSMiddleware,

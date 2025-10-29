@@ -33,6 +33,15 @@ Legacy Program Files → AI Agent Extractor → Vector Database → Knowledge Ex
 - **Frontend**: Modern HTML5/CSS3/JavaScript with marked.js
 - **Orchestration**: Agent-based architecture with Chain-of-Thought prompting
 
+## 📸 System Screenshots
+
+| Interface | Description |
+|-----------|-------------|
+| ![Extractor](./images/Extractor_Agent_Screen.png) | **Agent Extractor**: AI-powered code analysis |
+| ![RAG Search](./images/RAG_Agent_Screen.png) | **Knowledge Explorer**: Vector search & discovery |
+| ![Future State](./images/FutureState_Agent_Screen.png) | **Future State Generator**: Modernization planning |
+| ![API Docs](./images/API_Agent_Screen.png) | **API Documentation**: Interactive REST endpoints |
+
 ## 🚀 Quick Start
 
 ### Prerequisites
@@ -115,6 +124,9 @@ Legacy Program Files → AI Agent Extractor → Vector Database → Knowledge Ex
 3. View structured results with business rules, data definitions, and logic patterns
 4. Results automatically stored in vector database for future search
 
+![Agent Extractor Interface](./images/Extractor_Agent_Screen.png)
+*AI-powered legacy program analysis with real-time business rule extraction*
+
 ### 2. Knowledge Base Exploration
 
 **Knowledge Explorer Interface** (`/static/future_state.html`):
@@ -124,6 +136,9 @@ Legacy Program Files → AI Agent Extractor → Vector Database → Knowledge Ex
 3. Select requirements for modernization analysis
 4. Access comprehensive knowledge base of all extracted rules
 
+![Knowledge Base Explorer](./images/RAG_Agent_Screen.png)
+*Interactive search and discovery using RAG (Retrieval-Augmented Generation) technology*
+
 ### 3. Future State Generation
 
 **AI Modernization Assistant**:
@@ -132,6 +147,9 @@ Legacy Program Files → AI Agent Extractor → Vector Database → Knowledge Ex
 2. Specify business constraints and architecture preferences
 3. Generate detailed modernization recommendations using Chain-of-Thought AI
 4. Receive step-by-step transformation roadmaps and technology suggestions
+
+![Future State Generation](./images/FutureState_Agent_Screen.png)
+*Chain-of-Thought AI for intelligent modernization roadmaps and architecture recommendations*
 
 ## 🔧 Advanced Features
 
@@ -161,6 +179,9 @@ Legacy Program Files → AI Agent Extractor → Vector Database → Knowledge Ex
 | `/generate-future-state` | POST   | AI modernization recommendations        |
 | `/upload-legacy`         | POST   | Traditional file upload and parsing     |
 | `/stats`                 | GET    | System statistics and metrics           |
+
+![API Documentation](./images/API_Agent_Screen.png)
+*Comprehensive REST API with interactive documentation and testing capabilities*
 
 ### AI Agent Extraction
 
